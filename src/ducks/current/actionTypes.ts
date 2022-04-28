@@ -1,5 +1,8 @@
 import {ActionInterface, ActionPayload} from "chums-ducks";
 import {Recipient, ReportRecord} from "../../app/types";
+import {ThunkAction} from "redux-thunk";
+import {RootState} from "../../app/rootReducer";
+import {actionHelper, apiActionHelper} from "../utils";
 
 export interface CurrentPayload extends ActionPayload {
     report?: ReportRecord,
@@ -13,20 +16,22 @@ export interface CurrentAction extends ActionInterface {
     payload?: CurrentPayload,
 }
 
+export interface CurrentThunkAction extends ThunkAction<any, RootState, unknown, CurrentAction> {}
 
 
-export const currentLoadRequested = 'current/loadRequested';
-export const currentLoadSucceeded = 'current/loadSucceeded';
-export const currentLoadFailed = 'current/loadFailed';
+export const currentLoad = 'current/load';
+export const [currentLoadPending, currentLoadResolved, currentLoadRejected] = apiActionHelper(currentLoad);
 
-export const currentSaveRequested = 'current/saveRequested';
-export const currentSaveSucceeded = 'current/saveSucceeded';
-export const currentSaveFailed = 'current/saveFailed';
+export const currentSave = 'current/save';
+export const [currentSavePending, currentSaveResolved, currentSaveRejected] = apiActionHelper(currentSave);
 
-export const currentReportSelected = 'current/reportSelected';
-export const currentReportChanged = 'current/reportChanged';
+export const currentReportSelected = 'current/selected';
+export const currentReportChanged = 'current/changed';
 
-export const currentRecipientChanged = 'current/recipientChanged';
-export const currentSaveRecipientRequested = 'current/saveRecipientRequested';
-export const currentSaveRecipientSucceeded = 'current/saveRecipientSucceeded';
-export const currentSaveRecipientFailed = 'current/saveRecipientFailed';
+export const currentRecipientSelected = 'current/recipientSelected';
+
+export const currentSaveRecipient = 'current/saveRecipient';
+export const [currentSaveRecipientPending, currentSaveRecipientResolved, currentSaveRecipientRejected] = apiActionHelper(currentSaveRecipient);
+
+export const currentDeleteRecipient = 'current/deleteRecipient';
+export const [currentDeleteRecipientPending, currentDeleteRecipientResolved, currentDeleteRecipientRejected] = apiActionHelper(currentDeleteRecipient);

@@ -2,20 +2,30 @@ import {combineReducers} from "redux";
 import {Recipient, ReportRecord} from "../../app/types";
 import {
     CurrentAction,
-    currentLoadSucceeded,
-    currentRecipientChanged,
+    currentDeleteRecipientPending,
+    currentDeleteRecipientRejected,
+    currentDeleteRecipientResolved,
+    currentLoadPending,
+    currentLoadRejected,
+    currentLoadResolved,
     currentReportSelected,
-    currentSaveRecipientSucceeded
+    currentSavePending,
+    currentSaveRecipientPending,
+    currentSaveRecipientRejected,
+    currentSaveRecipientResolved,
+    currentSaveRejected,
+    currentSaveResolved
 } from "./actionTypes";
-import {recipientSorter} from "./utils";
+import {recipientIDSorter, recipientSorter} from "./utils";
+import {default as recipientsReducer} from './recipientsReducer'
 
 
-const reportReducer = (state:ReportRecord|null = null, action:CurrentAction):ReportRecord|null => {
+const reportReducer = (state: ReportRecord | null = null, action: CurrentAction): ReportRecord | null => {
     const {type, payload} = action;
     switch (type) {
     case currentReportSelected:
-    case currentLoadSucceeded:
-    case currentSaveRecipientSucceeded:
+    case currentLoadResolved:
+    case currentSaveResolved:
         if (payload?.report) {
             return {
                 ...payload.report,
@@ -28,24 +38,24 @@ const reportReducer = (state:ReportRecord|null = null, action:CurrentAction):Rep
     }
 }
 
-const recipientsReducer = (state:Recipient[] = [], action:CurrentAction):Recipient[] => {
-    const {type, payload} = action;
+
+const loadingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
     switch (type) {
-    case currentReportSelected:
-    case currentLoadSucceeded:
-        if (payload?.recipients) {
-            return payload.recipients.sort(recipientSorter('id'));
-        }
-        return [];
-    case currentRecipientChanged:
-    case currentSaveRecipientSucceeded:
-        if (payload?.id && payload?.recipient) {
-            return [
-                ...state.filter(rec => rec.id !== payload.id),
-                {...payload.recipient, changed: true}
-            ].sort(recipientSorter())
-        }
-        return state;
+    case currentLoadPending:
+    case currentSavePending:
+    case currentSaveRecipientPending:
+    case currentDeleteRecipientPending:
+        return true;
+    case currentLoadResolved:
+    case currentLoadRejected:
+    case currentSaveResolved:
+    case currentSaveRejected:
+    case currentSaveRecipientResolved:
+    case currentSaveRecipientRejected:
+    case currentDeleteRecipientResolved:
+    case currentDeleteRecipientRejected:
+        return false
     default:
         return state;
     }
@@ -53,5 +63,6 @@ const recipientsReducer = (state:Recipient[] = [], action:CurrentAction):Recipie
 
 export default combineReducers({
     report: reportReducer,
+    loading: loadingReducer,
     recipients: recipientsReducer,
 });

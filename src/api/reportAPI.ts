@@ -12,8 +12,8 @@ const debug = (...args:any[]):void => console.log('api:reportApi:', ...args);
 export async function fetchReports():Promise<ReportRecord[]> {
     try {
         const url = '/api/report-scheduler/reports';
-        const {result} = await fetchJSON<{result: ReportRecord[]}>(url, {cache: 'no-cache'});
-        return result;
+        const {reports} = await fetchJSON<{reports: ReportRecord[]}>(url, {cache: 'no-cache'});
+        return reports;
     } catch(err:unknown) {
         if (err instanceof Error) {
             return Promise.reject(err);
@@ -25,8 +25,7 @@ export async function fetchReports():Promise<ReportRecord[]> {
 export async function fetchReport(id:number):Promise<{ report: ReportRecord, recipients: Recipient[]}> {
     try {
         const url = `/api/report-scheduler/reports/${encodeURIComponent(id)}`;
-        const {result} = await fetchJSON<{result: ReportResponse}>(url);
-        const {recipients, ...report} = result;
+        const {report, recipients} = await fetchJSON<{report: ReportRecord, recipients: Recipient[]}>(url);
         return {report, recipients};
     } catch(err:unknown) {
         if (err instanceof Error) {
@@ -43,8 +42,7 @@ export async function saveReport(_report:ReportRecord):Promise<{report:ReportRec
         const body = JSON.stringify(_report);
         const url = `/api/report-scheduler/reports/${encodeURIComponent(_report.id || '')}`;
         const method = _report.id ? 'PUT' : 'POST';
-        const {result} = await fetchJSON<{result: ReportResponse}>(url, {method, body});
-        const {recipients, ...report} = result;
+        const {report, recipients} = await fetchJSON<{report: ReportRecord, recipients: Recipient[]}>(url, {method, body});
         return {report, recipients};
     } catch(err:unknown) {
         if (err instanceof Error) {

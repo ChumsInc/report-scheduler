@@ -5,6 +5,7 @@ export const reportCompare = (field: keyof ReportRecord) =>
         switch (field) {
         case 'id':
         case 'changed':
+        case "data_type":
             return a.id - b.id;
         case 'month_days':
         case 'week_days':
@@ -15,6 +16,7 @@ export const reportCompare = (field: keyof ReportRecord) =>
             return (a[field] || '').toLowerCase() > (b[field] || '').toLowerCase() ? 1 : -1
         }
     }
+
 export const reportSorter = (field:keyof ReportRecord, ascending: boolean = true) =>
     (a:ReportRecord, b:ReportRecord):number => {
         return (

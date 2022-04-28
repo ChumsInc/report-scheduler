@@ -1,22 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {fetchReportsAction} from "./actions";
-import {selectList, selectLoading} from "./selectors";
+import {selectList, selectReportsLoading} from "./selectors";
 import {FormCheck, SpinnerButton} from "chums-ducks";
 import classNames from "classnames";
 import WeekDays from "./WeekDays";
+import MonthDays from "../current/MonthDays";
+import {ReportRecord} from "../../app/types";
+import {currentReportSelected} from "../current/actionTypes";
+import {selectReportAction} from "../current/actions";
+import {reportSorter} from "./utils";
 
 const ReportList:React.FC = () => {
     const dispatch = useDispatch();
     const list = useSelector(selectList);
     const [showInactive, setShowInactive] = useState(false);
-    const loading = useSelector(selectLoading);
+    const loading = useSelector(selectReportsLoading);
 
     useEffect(() => {
         dispatch(fetchReportsAction());
     }, [])
 
     const onReload = () => dispatch(fetchReportsAction());
+
+    const onClickRow = (row:ReportRecord) => dispatch(selectReportAction(row));
 
     return (
         <div>
@@ -37,18 +44,19 @@ const ReportList:React.FC = () => {
                 <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Repy To</th>
-                    <th>Schedule</th>
+                    <th>Weekly</th>
+                    <th>Monthly</th>
                 </tr>
                 </thead>
                 <tbody>
                 {list
                     .filter(row => showInactive || !!row.enabled)
+                    .sort(reportSorter('title', true))
                     .map(row => (
-                    <tr key={row.id} className={classNames({'text-danger': !row.enabled})}>
+                    <tr key={row.id} className={classNames({'text-danger': !row.enabled})} onClick={() => onClickRow(row)}>
                         <td>{row.title}</td>
-                        <td>{row.reply_to}</td>
-                        <td><WeekDays weekDays={row.week_days} /> {row.month_days}</td>
+                        <td><WeekDays weekDays={row.week_days} /></td>
+                        <td><MonthDays monthDays={row.month_days} /></td>
                     </tr>
                 ))}
                 </tbody>

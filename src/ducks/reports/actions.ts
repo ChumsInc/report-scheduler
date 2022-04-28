@@ -7,7 +7,7 @@ import {
 } from "./actionTypes";
 import {ThunkAction} from "redux-thunk";
 import {RootState} from "../../app/rootReducer";
-import {selectLoading} from "./selectors";
+import {selectReportsLoading} from "./selectors";
 import {fetchReports} from "../../api/reportAPI";
 
 interface ReportThunkAction extends ThunkAction<any, RootState, unknown, ReportAction> {
@@ -18,7 +18,7 @@ export const fetchReportsAction = (): ReportThunkAction =>
     async (dispatch, getState) => {
         try {
             const state = getState();
-            if (selectLoading(state)) {
+            if (selectReportsLoading(state)) {
                 return;
             }
             dispatch({type: reportsFetchListPending})

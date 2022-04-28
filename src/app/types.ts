@@ -3,8 +3,8 @@ import WeekDays from "../ducks/reports/WeekDays";
 export interface ReportRecord {
     id: number,
     title: string,
-    data_type: null,
-    enabled: boolean|1|0,
+    data_type: unknown,
+    enabled: boolean,
     url_path: string,
     url_generator: string,
     url_query: string|null,
@@ -63,6 +63,18 @@ export interface Recipient extends EmailRecipient, RepRecipient, CustomerRecipie
     changed?: boolean,
 }
 
+export interface RecipientBody {
+    id: number,
+    idReport: number,
+    RecipientType: 'email'|'rep'|'cust'|null,
+    Company: string,
+    EmailAddress: string|null,
+    ARDivisionNo: string|null,
+    CustomerNo: string|null,
+    SalespersonDivisionNo: string|null,
+    SalespersonNo: string|null,
+    active: boolean,
+}
 
 export interface LogRecord {
     id: number,
@@ -100,3 +112,5 @@ export const dayNames:DayNameList = {
     '5': 'F',
     '6': 'S'
 };
+
+
