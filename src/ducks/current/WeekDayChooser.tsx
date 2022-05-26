@@ -23,12 +23,10 @@ const WeekDayChooser: React.FC<WeekDayChooser> = ({week_days, onChange}) => {
     }
     return (
         <div className="d-flex">
-            {
-                days
-                .map(day => <WeekDayButton day={day}
-                                           checked={hasDay(day)}
-                                           onChange={changeHandler(day)}/>
-                )}
+            {days.map(day => <WeekDayButton day={day} key={day}
+                                            checked={hasDay(day)}
+                                            onChange={changeHandler(day)}/>
+            )}
         </div>
     )
 }

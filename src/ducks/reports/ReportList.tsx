@@ -7,11 +7,11 @@ import classNames from "classnames";
 import WeekDays from "./WeekDays";
 import MonthDays from "../current/MonthDays";
 import {ReportRecord} from "../../app/types";
-import {currentReportSelected} from "../current/actionTypes";
 import {selectReportAction} from "../current/actions";
 import {reportSorter} from "./utils";
+import {defaultReport} from "../current/selectors";
 
-const ReportList:React.FC = () => {
+const ReportList: React.FC = () => {
     const dispatch = useDispatch();
     const list = useSelector(selectList);
     const [showInactive, setShowInactive] = useState(false);
@@ -23,7 +23,7 @@ const ReportList:React.FC = () => {
 
     const onReload = () => dispatch(fetchReportsAction());
 
-    const onClickRow = (row:ReportRecord) => dispatch(selectReportAction(row));
+    const onClickRow = (row: ReportRecord) => dispatch(selectReportAction(row));
 
     return (
         <div>
@@ -32,11 +32,15 @@ const ReportList:React.FC = () => {
                     <h3>Scheduled Reports</h3>
                 </div>
                 <div className="col-auto">
+                    <button onClick={() => onClickRow(defaultReport)} className="btn btn-sm btn-outline-secondary">New
+                    </button>
+                </div>
+                <div className="col-auto">
                     <SpinnerButton spinning={loading} onClick={onReload} size="sm">Reload</SpinnerButton>
                 </div>
                 <div className="col-auto">
                     <FormCheck label="Show Inactive" checked={showInactive}
-                               onClick={() => setShowInactive(!showInactive)} type="checkbox" />
+                               onClick={() => setShowInactive(!showInactive)} type="checkbox"/>
                 </div>
             </div>
             <table className="table table-xs table-sticky">
@@ -50,15 +54,16 @@ const ReportList:React.FC = () => {
                 </thead>
                 <tbody>
                 {list
-                    .filter(row => showInactive || !!row.enabled)
+                    .filter(row => showInactive || row.enabled)
                     .sort(reportSorter('title', true))
                     .map(row => (
-                    <tr key={row.id} className={classNames({'text-danger': !row.enabled})} onClick={() => onClickRow(row)}>
-                        <td>{row.title}</td>
-                        <td><WeekDays weekDays={row.week_days} /></td>
-                        <td><MonthDays monthDays={row.month_days} /></td>
-                    </tr>
-                ))}
+                        <tr key={row.id} className={classNames({'text-danger': !row.enabled})}
+                            onClick={() => onClickRow(row)}>
+                            <td>{row.title}</td>
+                            <td><WeekDays weekDays={row.week_days}/></td>
+                            <td><MonthDays monthDays={row.month_days}/></td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 

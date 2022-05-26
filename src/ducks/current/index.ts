@@ -1,22 +1,18 @@
 import {combineReducers} from "redux";
-import {Recipient, ReportRecord} from "../../app/types";
+import {ReportRecord, RunResponse} from "../../app/types";
 import {
     CurrentAction,
-    currentDeleteRecipientPending,
-    currentDeleteRecipientRejected,
-    currentDeleteRecipientResolved,
+    currentExecPending,
+    currentExecRejected,
+    currentExecResolved,
     currentLoadPending,
     currentLoadRejected,
     currentLoadResolved,
     currentReportSelected,
     currentSavePending,
-    currentSaveRecipientPending,
-    currentSaveRecipientRejected,
-    currentSaveRecipientResolved,
     currentSaveRejected,
     currentSaveResolved
 } from "./actionTypes";
-import {recipientIDSorter, recipientSorter} from "./utils";
 import {default as recipientsReducer} from './recipientsReducer'
 
 
@@ -43,26 +39,61 @@ const loadingReducer = (state: boolean = false, action: CurrentAction): boolean 
     const {type} = action;
     switch (type) {
     case currentLoadPending:
-    case currentSavePending:
-    case currentSaveRecipientPending:
-    case currentDeleteRecipientPending:
         return true;
     case currentLoadResolved:
     case currentLoadRejected:
-    case currentSaveResolved:
-    case currentSaveRejected:
-    case currentSaveRecipientResolved:
-    case currentSaveRecipientRejected:
-    case currentDeleteRecipientResolved:
-    case currentDeleteRecipientRejected:
         return false
     default:
         return state;
     }
 }
 
+const savingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
+    switch (type) {
+    case currentSavePending:
+        return true;
+    case currentSaveResolved:
+    case currentSaveRejected:
+        return false
+    default:
+        return state;
+    }
+}
+
+const execRunReducer = (state: RunResponse = {}, action: CurrentAction): RunResponse => {
+    const {type, payload} = action;
+    switch (type) {
+    case currentReportSelected:
+        return {};
+    case currentExecPending:
+        return {pending: true};
+    case currentExecResolved:
+        return payload?.result || {};
+    case currentExecRejected:
+        return {error: payload?.error?.message};
+    default:
+        return state;
+    }
+}
+
+const isExecutingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
+    switch (type) {
+    case currentExecPending:
+        return true;
+    case currentExecResolved:
+    case currentExecRejected:
+        return false
+    default:
+        return state;
+    }
+}
 export default combineReducers({
     report: reportReducer,
     loading: loadingReducer,
+    saving: savingReducer,
     recipients: recipientsReducer,
+    execRun: execRunReducer,
+    isExecuting: isExecutingReducer,
 });

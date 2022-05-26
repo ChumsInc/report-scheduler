@@ -1,4 +1,5 @@
-import WeekDays from "../ducks/reports/WeekDays";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+
 
 export interface ReportRecord {
     id: number,
@@ -32,8 +33,6 @@ export interface RepRecipient {
     Company: string,
     SalespersonDivisionNo: string,
     SalespersonNo: string,
-    SalespersonName: string,
-    SalespersonEmailAddress: string,
     SalesManagerDivisionNo: string,
     SalesManagerNo: string,
     SalesManagerName: string|null,
@@ -44,20 +43,22 @@ export interface CustomerRecipient {
     Company: string,
     ARDivisionNo: string|null,
     CustomerNo: string|null,
-    CustomerName: string,
-    CustomerEmailAddress: string,
     SalespersonDivisionNo: string,
     SalespersonNo: string
+    SalesManagerName: string|null,
+    SalesManagerEmailAddress: string|null,
 }
 export interface EmailRecipient {
     Name: string,
     EmailAddress: string,
 }
 
+export type RecipientType = 'email'|'rep'|'cust'|null;
+
 export interface Recipient extends EmailRecipient, RepRecipient, CustomerRecipient {
     id: number,
     idReport: number,
-    RecipientType: 'email'|'rep'|'cust'|null,
+    RecipientType: RecipientType,
     active: boolean,
     RecipientData: EmailRecipient,
     changed?: boolean,
@@ -66,7 +67,7 @@ export interface Recipient extends EmailRecipient, RepRecipient, CustomerRecipie
 export interface RecipientBody {
     id: number,
     idReport: number,
-    RecipientType: 'email'|'rep'|'cust'|null,
+    RecipientType: RecipientType,
     Company: string,
     EmailAddress: string|null,
     ARDivisionNo: string|null,
@@ -114,3 +115,29 @@ export const dayNames:DayNameList = {
 };
 
 
+export interface Address {
+    name: string;
+    address: string;
+}
+
+export interface DryRunResult {
+    report: ReportRecord,
+    content: string|object,
+    recipients: (Address|string)[],
+    cc?: (Address|string)[],
+    replyTo: Address|string,
+    title: string
+}
+
+export interface FailedSendResult extends Partial<ReportRecord> {
+    status: string,
+}
+
+export type ProcessResult = SMTPTransport.SentMessageInfo|DryRunResult|FailedSendResult;
+
+export interface RunResponse {
+    today?: ProcessResult[],
+    pending?: boolean,
+    dryRun?:boolean,
+    error?: string,
+}

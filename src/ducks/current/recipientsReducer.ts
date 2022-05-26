@@ -1,23 +1,18 @@
 import {combineReducers} from "redux";
 import {Recipient} from "../../app/types";
 import {
-    CurrentAction,
-    currentDeleteRecipientPending,
-    currentDeleteRecipientRejected,
+    CurrentAction, currentDeleteRecipientPending, currentDeleteRecipientRejected,
     currentDeleteRecipientResolved,
-    currentLoadPending,
+    currentLoadPending, currentLoadRecipientPending, currentLoadRecipientRejected, currentLoadRecipientResolved,
     currentLoadRejected,
     currentLoadResolved,
     currentRecipientSelected,
-    currentReportSelected,
-    currentSavePending,
-    currentSaveRecipientPending,
-    currentSaveRecipientRejected,
+    currentReportSelected, currentSaveRecipientPending, currentSaveRecipientRejected,
     currentSaveRecipientResolved,
-    currentSaveRejected,
     currentSaveResolved
 } from "./actionTypes";
 import {recipientIDSorter} from "./utils";
+import {defaultRecipient} from "./selectors";
 
 const listReducer = (state: Recipient[] = [], action: CurrentAction): Recipient[] => {
     const {type, payload} = action;
@@ -36,22 +31,70 @@ const listReducer = (state: Recipient[] = [], action: CurrentAction): Recipient[
     }
 }
 
-const selectedReducer = (state:Recipient|null = null, action:CurrentAction):Recipient|null => {
+const selectedReducer = (state: Recipient = defaultRecipient(), action: CurrentAction): Recipient => {
     const {type, payload} = action;
     switch (type) {
     case currentRecipientSelected:
+    case currentSaveRecipientResolved:
+    case currentLoadRecipientResolved:
         if (payload?.recipient) {
             return {...payload.recipient};
         }
-        return null;
+        return defaultRecipient(state.idReport);
+    case currentDeleteRecipientResolved:
+        return defaultRecipient(state.idReport);
     case currentReportSelected:
-        return null;
+        return defaultRecipient(payload?.report?.id);
     default:
         return state;
     }
 }
 
+const listLoadingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
+    switch (type) {
+    case currentLoadPending:
+        return true;
+    case currentLoadResolved:
+    case currentLoadRejected:
+        return false;
+    default: return state;
+    }
+}
+
+const selectedLoadingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
+    switch (type) {
+    case currentLoadRecipientPending:
+        return true;
+    case currentLoadRecipientResolved:
+    case currentLoadRecipientRejected:
+        return false;
+    default: return state;
+    }
+}
+
+const selectedSavingReducer = (state: boolean = false, action: CurrentAction): boolean => {
+    const {type} = action;
+    switch (type) {
+    case currentSaveRecipientPending:
+    case currentDeleteRecipientPending:
+        return true;
+    case currentSaveRecipientResolved:
+    case currentSaveRecipientRejected:
+    case currentDeleteRecipientResolved:
+    case currentDeleteRecipientRejected:
+        return false;
+    default: return state;
+    }
+}
+
 export default combineReducers({
     list: listReducer,
-    selected: selectedReducer,
+    listLoading: listLoadingReducer,
+    selected: combineReducers({
+        recipient: selectedReducer,
+        loading: selectedLoadingReducer,
+        saving: selectedSavingReducer,
+    }),
 })

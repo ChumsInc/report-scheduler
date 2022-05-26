@@ -5,7 +5,10 @@ import App from './app/App';
 import store from './app/configureStore'
 
 render(
-    <Provider store={store}>
-        <App/>
-    </Provider>, document.getElementById('app')
+    <React.StrictMode>
+        <Provider store={store}>
+            <App/>
+        </Provider>
+    </React.StrictMode>
+, document.getElementById('app')
 );

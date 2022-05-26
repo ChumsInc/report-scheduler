@@ -3,18 +3,18 @@ import ReportList from "../ducks/reports/ReportList";
 import ReportEditor from "../ducks/current/ReportEditor";
 import Recipients from "../ducks/current/Recipients";
 
-const App:React.FC = () => {
+const App: React.FC = () => {
 
     return (
         <div className="row g-3">
             <div className="col-4">
-                <ReportList />
+                <ReportList/>
             </div>
             <div className="col-4">
-                <ReportEditor />
+                <ReportEditor/>
             </div>
             <div className="col-4">
-                <Recipients />
+                <Recipients/>
             </div>
         </div>
     )

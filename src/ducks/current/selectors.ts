@@ -1,13 +1,18 @@
 import {RootState} from "../../app/rootReducer";
-import {EmailRecipient, Recipient, ReportRecord} from "../../app/types";
+import {Recipient, ReportRecord} from "../../app/types";
 
 
-export const selectCurrentReport = (state:RootState) => state.current.report;
-export const selectCurrentRecipients = (state:RootState) => state.current.recipients.list;
-export const selectSelectedRecipient = (state:RootState) => state.current.recipients.selected;
-export const selectCurrentLoading = (state:RootState) => state.current.loading;
+export const selectCurrentReport = (state: RootState) => state.current.report;
+export const selectCurrentRecipients = (state: RootState) => state.current.recipients.list;
+export const selectSelectedRecipient = (state: RootState) => state.current.recipients.selected.recipient;
+export const selectSelectedRecipientLoading = (state: RootState) => state.current.recipients.selected.loading;
+export const selectSelectedRecipientSaving = (state: RootState) => state.current.recipients.selected.saving;
+export const selectCurrentLoading = (state: RootState) => state.current.loading;
+export const selectCurrentSaving = (state: RootState) => state.current.saving;
+export const selectExecRun = (state: RootState) => state.current.execRun;
+export const selectIsExecuting = (state: RootState) => state.current.isExecuting;
 
-export const defaultReport:ReportRecord = {
+export const defaultReport: ReportRecord = {
     id: 0,
     title: '',
     data_type: null,
@@ -24,26 +29,22 @@ export const defaultReport:ReportRecord = {
     month_days: [],
 }
 
-export const defaultRecipient = (idReport:number):Recipient => ({
+export const defaultRecipient = (idReport?: number): Recipient => ({
     id: 0,
-    idReport,
-    Company: 'chums',
-    EmailAddress: '',
+    idReport: idReport || 0,
     RecipientType: null,
     active: true,
     RecipientData: {
         Name: '',
         EmailAddress: '',
     },
+    Company: 'chums',
+    EmailAddress: '',
     Name: '',
     ARDivisionNo: '',
     CustomerNo: '',
-    CustomerEmailAddress: '',
-    CustomerName: '',
     SalespersonDivisionNo: '',
     SalespersonNo: '',
-    SalespersonEmailAddress: '',
-    SalespersonName: '',
     SalesManagerDivisionNo: '',
     SalesManagerNo: '',
     SalesManagerEmailAddress: '',

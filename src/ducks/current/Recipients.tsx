@@ -1,5 +1,6 @@
 import React from 'react';
 import RecipientsList from "./RecipientsList";
+import RecipientEditor from "./RecipientEditor";
 
 const Recipients:React.FC = () => {
     return (
@@ -9,6 +10,7 @@ const Recipients:React.FC = () => {
                 <RecipientsList />
             </div>
             <div>Recipients Editor</div>
+            <RecipientEditor />
         </div>
     )
 }
