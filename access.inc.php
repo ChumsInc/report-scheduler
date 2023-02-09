@@ -1,2 +1,2 @@
 <?php
-$allowedGroups = array(User::GROUP_ADMIN);
+$allowedGroups = [User::GROUP_ADMIN, User::GROUP_REPADMIN];
