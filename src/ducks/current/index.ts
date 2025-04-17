@@ -1,4 +1,4 @@
-import {Recipient, ReportRecord, RunResponse} from "../../app/types";
+import {Recipient, ReportRecord, RunResponse} from "@/app/types";
 import {createEntityAdapter, createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {newReport, recipientSorter} from "@/ducks/current/utils";
 import {

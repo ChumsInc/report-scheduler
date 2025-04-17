@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useId} from 'react';
-import {CustomerRecipient, EmailRecipient, Recipient, RepRecipient} from "@/app/types";
+import {EmailRecipient, Recipient} from "@/app/types";
 import {Col, Form, FormControl, InputGroup, Row} from "react-bootstrap";
 import EmailAddress from "@/components/common/EmailAddress";
 
@@ -38,12 +38,12 @@ export default function EmployeeRecipientEditor({recipient, onChange}: EmployeeR
                 <Col>
                     <InputGroup size="sm">
                         <InputGroup.Text aria-hidden>
-                            <span className="bi-person-fill" />
+                            <span className="bi-person-fill"/>
                         </InputGroup.Text>
                         <FormControl type="text" size="sm" required id={nameId}
                                      value={recipient.Name ?? ''}
                                      onChange={changeHandler('Name')}
-                                     minLength={4} maxLength={4} />
+                                     minLength={4} maxLength={4}/>
                     </InputGroup>
 
                 </Col>

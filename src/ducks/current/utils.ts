@@ -1,4 +1,4 @@
-import {Recipient, ReportRecord} from "../../app/types";
+import {Recipient, ReportRecord} from "@/app/types";
 import {SortProps} from "@chumsinc/sortable-tables";
 
 export const recipientSorter = ({field, ascending}:SortProps<Recipient>) =>

@@ -1,4 +1,4 @@
-import {ReportRecord} from "../../app/types";
+import {ReportRecord} from "@/app/types";
 import {reportSorter} from "./utils";
 import {createEntityAdapter, createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {SortProps} from "@chumsinc/sortable-tables";

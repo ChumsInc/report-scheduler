@@ -1,4 +1,4 @@
-import {days, LoadReportResponse, Recipient, ReportRecord, RunResponse, SaveRecipientsResponse} from "../app/types";
+import {LoadReportResponse, Recipient, ReportRecord, RunResponse, SaveRecipientsResponse} from "@/app/types";
 import {fetchJSON} from "@chumsinc/ui-utils";
 import dayjs from "dayjs";
 
@@ -130,7 +130,8 @@ export interface ExecRunProps {
     idReport: number;
     dryRun?: boolean;
 }
-export async function execRun(arg:ExecRunProps): Promise<RunResponse | null> {
+
+export async function execRun(arg: ExecRunProps): Promise<RunResponse | null> {
     try {
         let today = dayjs().format('YYYY-MM-DD');
         // explicitly require dryRun to be false in order to execute from the app.
