@@ -45,7 +45,7 @@ const currentReportSlice = createSlice({
     name: 'current',
     initialState: recipientsAdapter.getInitialState(initialState),
     reducers: {
-        setNewReport: (state, action) => {
+        setNewReport: (state) => {
             state.current = {...newReport};
             recipientsAdapter.removeAll(state);
         },

@@ -43,7 +43,7 @@ const reportsSlice = createSlice({
                 state.status = 'idle';
                 reportsAdapter.setAll(state, action.payload);
             })
-            .addCase(loadReports.rejected, (state, action) => {
+            .addCase(loadReports.rejected, (state) => {
                 state.status = 'rejected';
             })
     },
