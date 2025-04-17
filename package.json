@@ -1,6 +1,6 @@
 {
   "name": "report-scheduler",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Chums Report Scheduler",
   "main": "index.tsx",
   "scripts": {
