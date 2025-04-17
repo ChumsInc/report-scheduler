@@ -8,15 +8,15 @@
  * @copyright Copyright &copy; 2013, steve
  */
 
-require_once ("autoload.inc.php");
-require_once 'access.inc.php';
+use chums\ui\WebUI2;
+use chums\user\Groups;
 
-$bodyPath = "/apps/report-scheduler/";
-$title = "Report Scheduler";
-$description = "";
+require_once "autoload.inc.php";
 
-$ui = new WebUI($bodyPath, $title, $description, true, 5);
-$ui->bodyClassName = 'container-fluid';
-$ui->AddCSS("public/css/styles.css");
-$ui->addManifest('public/js/manifest.json');
-$ui->Send();
+$ui = new WebUI2([
+    'title' => 'Report Scheduler',
+    'bodyClassName' => 'container-fluid',
+    'requiredRoles' => [Groups::ADMIN, Groups::REPADMIN],
+]);
+$ui->addManifestJSON('public/js/manifest.json')
+    ->render();
