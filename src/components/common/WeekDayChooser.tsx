@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import {dayNames, days, WeekDay} from "../../app/types";
+import {dayNames, days, WeekDay} from "@/app/types";
 
 
 export interface WeekDayChooser {

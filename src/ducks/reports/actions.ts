@@ -1,55 +1,19 @@
-import {
-    ReportAction,
-    reportsFetchList,
-    reportsFetchListPending,
-    reportsFetchListRejected,
-    reportsFetchListResolved
-} from "./actionTypes";
-import {ThunkAction} from "redux-thunk";
-import {RootState} from "../../app/rootReducer";
-import {selectReportsLoading} from "./selectors";
-import {fetchReports} from "../../api/reportAPI";
-
-interface ReportThunkAction extends ThunkAction<any, RootState, unknown, ReportAction> {
-}
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import {ReportRecord} from "@/app/types";
+import {RootState} from "@/app/configureStore";
+import {selectStatus} from "@/ducks/reports/index";
+import {fetchReports} from "@/api/reportAPI";
 
 
-export const fetchReportsAction = (): ReportThunkAction =>
-    async (dispatch, getState) => {
-        try {
+export const loadReports = createAsyncThunk<ReportRecord[], void, { state: RootState }>(
+    'reports/load',
+    async () => {
+        return await fetchReports();
+    },
+    {
+        condition: (arg, {getState}) => {
             const state = getState();
-            if (selectReportsLoading(state)) {
-                return;
-            }
-            dispatch({type: reportsFetchListPending})
-            const list = await fetchReports();
-            dispatch({type: reportsFetchListResolved, payload: {list}});
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log("fetchReportsAction()", error.message);
-                return dispatch({type: reportsFetchListRejected, payload: {error, context: reportsFetchList}});
-            }
-            dispatch({type: `${reportsFetchList}/failed`});
+            return selectStatus(state) === 'idle';
         }
     }
-
-
-// export const fetchReportsAction = createAsyncThunk(
-//     'reports/fetchList',
-//     async (args, thunkAPI) => {
-//         try {
-//             const state = thunkAPI.getState() as RootState;
-//             if (selectLoading(state)) {
-//                 thunkAPI.rejectWithValue({error: new Error('fetchReportsAction(): busy')});
-//             }
-//             const url = '/api/report-scheduler/reports';
-//             const {result} = await fetchJSON<{result: ReportRecord[]}>(url, {cache: 'no-cache'});
-//             return {list: result};
-//         } catch(err:unknown) {
-//             if (err instanceof Error) {
-//                 console.log("fetchReportsAction()", err.message);
-//                 return thunkAPI.rejectWithValue({error: error});
-//             }
-//         }
-//     }
-// );
+)

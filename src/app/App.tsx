@@ -1,22 +1,24 @@
-import React from 'react';
-import ReportList from "../ducks/reports/ReportList";
-import ReportEditor from "../ducks/current/ReportEditor";
-import Recipients from "../ducks/current/Recipients";
+import React, {useState} from 'react';
+import ReportEditor from "@/components/reports/ReportEditor";
+import RecipientsContainer from "@/components/recipients/RecipientsContainer";
+import ReportNotes from "@/components/reports/ReportNotes";
+import {HashRouter, Route, Routes} from 'react-router'
+import Main from "@/app/Main";
 
-const App: React.FC = () => {
+const App = () => {
 
+    const [tab, setTab] = useState("editor");
     return (
-        <div className="row g-3">
-            <div className="col-4">
-                <ReportList/>
-            </div>
-            <div className="col-4">
-                <ReportEditor/>
-            </div>
-            <div className="col-4">
-                <Recipients/>
-            </div>
-        </div>
+        <HashRouter>
+            <Routes>
+                <Route path="/" element={<Main/>}>
+                    <Route index element={<ReportEditor/>}/>
+                    <Route path="editor" element={<ReportEditor/>}/>
+                    <Route path="recipients" element={<RecipientsContainer/>}/>
+                    <Route path="notes" element={<ReportNotes/>}/>
+                </Route>
+            </Routes>
+        </HashRouter>
     )
 }
 

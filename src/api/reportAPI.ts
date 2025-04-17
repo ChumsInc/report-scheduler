@@ -1,29 +1,35 @@
-import {Recipient, ReportRecord, RunResponse} from "../app/types";
-import {fetchJSON} from "chums-ducks";
+import {days, LoadReportResponse, Recipient, ReportRecord, RunResponse, SaveRecipientsResponse} from "../app/types";
+import {fetchJSON} from "@chumsinc/ui-utils";
+import dayjs from "dayjs";
 
-const debug = (...args:any[]):void => console.log('api:reportApi:', ...args);
+const debug = (...args: any[]): void => console.log('api:reportApi:', ...args);
 
 
-
-export async function fetchReports():Promise<ReportRecord[]> {
+export async function fetchReports(): Promise<ReportRecord[]> {
     try {
-        const url = '/api/report-scheduler/reports';
-        const {reports} = await fetchJSON<{reports: ReportRecord[]}>(url, {cache: 'no-cache'});
-        return reports;
-    } catch(err:unknown) {
+        const url = '/api/report-scheduler/reports.json';
+        const res = await fetchJSON<{ reports: ReportRecord[] }>(url, {cache: 'no-cache'});
+        return res?.reports ?? [];
+    } catch (err: unknown) {
         if (err instanceof Error) {
+            console.debug("fetchReports()", err.message);
             return Promise.reject(err);
         }
+        console.debug("fetchReports()", err);
         return Promise.reject(new Error('Error in fetchReports()'));
     }
 }
 
-export async function fetchReport(id:number):Promise<{ report: ReportRecord, recipients: Recipient[]}> {
+export async function fetchReport(id: number): Promise<LoadReportResponse | null> {
     try {
-        const url = `/api/report-scheduler/reports/${encodeURIComponent(id)}`;
-        const {report, recipients} = await fetchJSON<{report: ReportRecord, recipients: Recipient[]}>(url);
+        const url = `/api/report-scheduler/reports/${encodeURIComponent(id)}.json`;
+        const res = await fetchJSON<{ report: ReportRecord, recipients: Recipient[] }>(url);
+        if (!res || !res.report) {
+            return {report: null, recipients: []};
+        }
+        const {report, recipients = []} = res
         return {report, recipients};
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
             debug("fetchReport()", err.message);
             return Promise.reject(err);
@@ -33,90 +39,115 @@ export async function fetchReport(id:number):Promise<{ report: ReportRecord, rec
     }
 }
 
-export async function saveReport(_report:ReportRecord):Promise<{report:ReportRecord, recipients: Recipient[]}> {
+export async function postReport(arg: ReportRecord): Promise<LoadReportResponse | null> {
     try {
-        const body = JSON.stringify(_report);
-        const url = `/api/report-scheduler/reports/${encodeURIComponent(_report.id || '')}`;
-        const method = _report.id ? 'PUT' : 'POST';
-        const {report, recipients} = await fetchJSON<{report: ReportRecord, recipients: Recipient[]}>(url, {method, body});
-        return {report, recipients};
-    } catch(err:unknown) {
+        const body = JSON.stringify(arg);
+        const url = arg.id
+            ? '/api/report-scheduler/reports/:id.json'
+                .replace(':id', encodeURIComponent(arg.id))
+            : '/api/report-scheduler/reports.json'
+        ;
+        const method = arg.id ? 'PUT' : 'POST';
+        return await fetchJSON<{ report: ReportRecord, recipients: Recipient[] }>(url, {
+            method,
+            body
+        });
+    } catch (err: unknown) {
         if (err instanceof Error) {
-            debug("saveReport()", err.message);
+            debug("postReport()", err.message);
             return Promise.reject(err);
         }
-        debug("saveReport()", err);
-        return Promise.reject(new Error('Error in saveReport()'));
+        debug("postReport()", err);
+        return Promise.reject(new Error('Error in postReport()'));
     }
 }
 
+export type FetchRecipientProps = Pick<Recipient, 'id' | 'idReport'>;
 
-export async function getRecipient(_recipient:Recipient):Promise<{recipient: Recipient|null}> {
+export async function fetchRecipient(arg: FetchRecipientProps): Promise<Recipient | null> {
     try {
-        const url = `/api/report-scheduler/recipient/${encodeURIComponent(_recipient.idReport)}/${encodeURIComponent(_recipient.id)}`;
+        const url = `/api/report-scheduler/reports/:idReport/recipients/:id.json`
+            .replace(':idReport', encodeURIComponent(arg.idReport))
+            .replace(':id', encodeURIComponent(arg.id));
         const method = 'GET';
-        const {recipient} = await fetchJSON<{recipient: Recipient|null}>(url, {method});
-        return {recipient};
-    } catch(err:unknown) {
+        const res = await fetchJSON<{ recipient: Recipient | null }>(url, {method});
+        return res?.recipient ?? null;
+    } catch (err: unknown) {
         if (err instanceof Error) {
-            debug("saveRecipient()", err.message);
+            debug("fetchRecipient()", err.message);
             return Promise.reject(err);
         }
-        debug("saveRecipient()", err);
-        return Promise.reject(new Error('Error in saveRecipient()'));
+        debug("fetchRecipient()", err);
+        return Promise.reject(new Error('Error in fetchRecipient()'));
     }
 }
 
 
-export async function saveRecipient(_recipient:Recipient):Promise<{recipients: Recipient[], recipient: Recipient|null}> {
+export async function postRecipient(arg: Recipient): Promise<SaveRecipientsResponse | null> {
     try {
-        const body = JSON.stringify(_recipient);
-        const url = `/api/report-scheduler/recipient/${encodeURIComponent(_recipient.idReport)}/${encodeURIComponent(_recipient.id || '')}`;
-        const method = !!_recipient.id ? 'PUT' : 'POST';
-        const {recipients, recipient} = await fetchJSON<{recipients: Recipient[], recipient: Recipient|null}>(url, {method, body});
-        return {recipients, recipient};
-    } catch(err:unknown) {
+        const body = JSON.stringify(arg);
+        const url = arg.id
+            ? '/api/report-scheduler/reports/:idReport/recipients/:id.json'
+                .replace(':idReport', encodeURIComponent(arg.idReport))
+                .replace(':id', encodeURIComponent(arg.id))
+            : '/api/report-scheduler/reports/:idReport/recipients.json'
+                .replace(':idReport', encodeURIComponent(arg.idReport))
+        const method = !!arg.id ? 'PUT' : 'POST';
+        const res = await fetchJSON<{
+            recipients: Recipient[],
+            recipient: Recipient | null
+        }>(url, {method, body});
+        return res ?? null;
+    } catch (err: unknown) {
         if (err instanceof Error) {
-            debug("saveRecipient()", err.message);
+            debug("postRecipient()", err.message);
             return Promise.reject(err);
         }
-        debug("saveRecipient()", err);
-        return Promise.reject(new Error('Error in saveRecipient()'));
+        debug("postRecipient()", err);
+        return Promise.reject(new Error('Error in postRecipient()'));
     }
 }
 
-export async function deleteRecipient(_recipient:Recipient):Promise<{recipients: Recipient[]}> {
+export async function deleteRecipient(arg: Recipient): Promise<Recipient[]> {
     try {
-        const url = `/api/report-scheduler/recipient/${encodeURIComponent(_recipient.idReport)}/${encodeURIComponent(_recipient.id)}`;
+        const url = `/api/report-scheduler/reports/:idReport/recipients/:id.json`
+            .replace(':idReport', encodeURIComponent(arg.idReport))
+            .replace(':id', encodeURIComponent(arg.id));
         const method = 'DELETE';
-        const {recipients} = await fetchJSON<{recipients: Recipient[]}>(url, {method});
-        return {recipients};
-    } catch(err:unknown) {
+        const res = await fetchJSON<{ recipients: Recipient[] }>(url, {method});
+        return res?.recipients ?? [];
+    } catch (err: unknown) {
         if (err instanceof Error) {
-            debug("saveRecipient()", err.message);
+            debug("deleteRecipient()", err.message);
             return Promise.reject(err);
         }
-        debug("saveRecipient()", err);
-        return Promise.reject(new Error('Error in saveRecipient()'));
+        debug("deleteRecipient()", err);
+        return Promise.reject(new Error('Error in deleteRecipient()'));
     }
 }
 
-export async function execRun(report:ReportRecord, dryRun:boolean = true):Promise<RunResponse> {
+export interface ExecRunProps {
+    idReport: number;
+    dryRun?: boolean;
+}
+export async function execRun(arg:ExecRunProps): Promise<RunResponse | null> {
     try {
-        let today = 'today';
-        if (dryRun) {
-            const d = new Date();
-            today = [d.getFullYear().toString(), (d.getMonth() + 1).toString().padStart(2, '0'), d.getDate().toString().padStart(2, '0')].join('-');
+        let today = dayjs().format('YYYY-MM-DD');
+        // explicitly require dryRun to be false in order to execute from the app.
+        if (arg.dryRun === false) {
+            today = 'today';
         }
 
-        const url = `/api/report-scheduler/report/exec/${encodeURIComponent(today)}/${report.id}`;
+        const url = '/api/report-scheduler/report/:idReport/exec/:today.json'
+            .replace(':idReport', encodeURIComponent(arg.idReport))
+            .replace(':today', encodeURIComponent(today));
         return await fetchJSON(url);
-    } catch(err:unknown) {
+    } catch (err: unknown) {
         if (err instanceof Error) {
-            debug("testRun()", err.message);
+            debug("execRun()", err.message);
             return Promise.reject(err);
         }
-        debug("testRun()", err);
-        return Promise.reject(new Error('Error in testRun()'));
+        debug("execRun()", err);
+        return Promise.reject(new Error('Error in execRun()'));
     }
 }

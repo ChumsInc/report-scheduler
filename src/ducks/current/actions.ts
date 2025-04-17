@@ -1,153 +1,93 @@
+import {LoadReportResponse, Recipient, ReportRecord, RunResponse, SaveRecipientsResponse} from "@/app/types";
 import {
-    currentDeleteRecipient,
-    currentDeleteRecipientPending,
-    currentDeleteRecipientRejected,
-    currentDeleteRecipientResolved, currentExecPending, currentExecRejected, currentExecResolved,
-    currentLoad,
-    currentLoadPending,
-    currentLoadRecipient,
-    currentLoadRecipientPending,
-    currentLoadRecipientRejected,
-    currentLoadRecipientResolved,
-    currentLoadRejected,
-    currentLoadResolved,
-    currentRecipientSelected,
-    currentReportSelected,
-    currentSave,
-    currentSavePending,
-    currentSaveRecipient,
-    currentSaveRecipientPending,
-    currentSaveRecipientRejected,
-    currentSaveRecipientResolved,
-    currentSaveRejected,
-    currentSaveResolved,
-    CurrentThunkAction
-} from "./actionTypes";
-import {Recipient, ReportRecord} from "../../app/types";
-import {selectReportsLoading} from "../reports/selectors";
-import {defaultRecipient, selectCurrentLoading, selectIsExecuting} from "./selectors";
-import {deleteRecipient, execRun, fetchReport, getRecipient, saveRecipient, saveReport} from "../../api/reportAPI";
+    deleteRecipient,
+    execRun,
+    ExecRunProps,
+    fetchRecipient,
+    FetchRecipientProps,
+    fetchReport,
+    postRecipient,
+    postReport
+} from "@/api/reportAPI";
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import {RootState} from "@/app/configureStore";
+import {selectCurrentReportStatus} from "@/ducks/current/index";
 
-export const selectReportAction = (report: ReportRecord): CurrentThunkAction =>
-    (dispatch) => {
-        dispatch({type: currentReportSelected, payload: {report}});
-        if (report.id) {
-            dispatch(fetchReportAction(report.id))
-        }
-    }
 
-export const fetchReportAction = (id: number): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
+export const loadReport = createAsyncThunk<LoadReportResponse | null, number, { state: RootState }>(
+    'current/load',
+    async (arg) => {
+        return await fetchReport(arg);
+    },
+    {
+        condition: (arg, {getState}) => {
             const state = getState();
-            if (selectReportsLoading(state) || selectCurrentLoading(state)) {
-                return;
-            }
-            dispatch({type: currentLoadPending});
-            const {report, recipients} = await fetchReport(id);
-            dispatch({type: currentLoadResolved, payload: {report, recipients}});
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log("fetchReportAction()", error.message);
-                return dispatch({type: currentLoadRejected, payload: {error, context: currentLoad}})
-            }
-            console.error("fetchReportAction()", error);
+            return selectCurrentReportStatus(state) === 'idle'
         }
     }
+)
 
-export const saveReportAction = (_report: ReportRecord): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
+export const saveReport = createAsyncThunk<LoadReportResponse | null, ReportRecord, { state: RootState }>(
+    'current/save',
+    async (arg) => {
+        return await postReport(arg);
+    },
+    {
+        condition: (arg, {getState}) => {
             const state = getState();
-            if (selectReportsLoading(state) || selectCurrentLoading(state)) {
-                return;
-            }
-            dispatch({type: currentSavePending});
-            const {report, recipients} = await saveReport(_report);
-            dispatch({type: currentSaveResolved, payload: {report, recipients}});
-
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log("saveReportAction()", error.message);
-                return dispatch({type: currentSaveRejected, payload: {error, context: currentSave}})
-            }
-            console.error("saveReportAction()", error);
+            return selectCurrentReportStatus(state) === 'idle'
         }
     }
+)
 
-
-export const selectRecipientAction = (recipient: Recipient): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
-            dispatch({type: currentRecipientSelected, payload: {recipient}});
-            if (recipient.id) {
-                dispatch({type: currentLoadRecipientPending});
-                const {recipient: r} = await getRecipient(recipient);
-                dispatch({
-                    type: currentLoadRecipientResolved,
-                    payload: {recipient: r || defaultRecipient(recipient.idReport)}
-                });
-            }
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.debug("selectRecipientAction()", error.message);
-                return dispatch({type: currentLoadRecipientRejected, payload: {error, context: currentLoadRecipient}})
-            }
-            console.debug("selectRecipientAction()", error);
-        }
-    }
-
-export const saveRecipientAction = (recipient: Recipient): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
-            dispatch({type: currentSaveRecipientPending});
-            const {recipients, recipient: r} = await saveRecipient(recipient);
-            dispatch({
-                type: currentSaveRecipientResolved,
-                payload: {recipients, recipient: r || defaultRecipient(recipient.idReport)}
-            });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.debug("selectRecipientAction()", error.message);
-                return dispatch({type: currentSaveRecipientRejected, payload: {error, context: currentSaveRecipient}})
-            }
-            console.debug("selectRecipientAction()", error);
-        }
-    }
-
-export const deleteRecipientAction = (recipient: Recipient): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
-            dispatch({type: currentDeleteRecipientPending});
-            const {recipients} = await deleteRecipient(recipient);
-            dispatch({type: currentDeleteRecipientResolved, payload: {recipients}});
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.debug("selectRecipientAction()", error.message);
-                return dispatch({
-                    type: currentDeleteRecipientRejected,
-                    payload: {error, context: currentDeleteRecipient}
-                })
-            }
-            console.debug("selectRecipientAction()", error);
-        }
-    }
-
-export const execRunAction = (report: ReportRecord, dryRun: boolean = true): CurrentThunkAction =>
-    async (dispatch, getState) => {
-        try {
+export const loadRecipient = createAsyncThunk<Recipient | null, FetchRecipientProps, { state: RootState }>(
+    'current/loadRecipient',
+    async (arg) => {
+        return await fetchRecipient(arg)
+    },
+    {
+        condition: (arg, {getState}) => {
             const state = getState();
-            if (selectIsExecuting(state)) {
-                return;
-            }
-            dispatch({type: currentExecPending});
-            const result = await execRun(report);
-            dispatch({type: currentExecResolved, payload: {result}});
-
-        } catch(err:unknown) {
-            if (err instanceof Error) {
-                console.debug("dryRunAction()", err.message);
-                dispatch({type: currentExecRejected, payload: {error: err}});
-            }
+            return selectCurrentReportStatus(state) === 'idle'
         }
     }
+)
+
+export const saveRecipient = createAsyncThunk<SaveRecipientsResponse | null, Recipient, { state: RootState }>(
+    'current/saveRecipient',
+    async (arg) => {
+        return await postRecipient(arg);
+    },
+    {
+        condition: (arg, {getState}) => {
+            const state = getState();
+            return selectCurrentReportStatus(state) === 'idle'
+        }
+    }
+)
+
+export const removeRecipient = createAsyncThunk<Recipient[], Recipient, { state: RootState }>(
+    'current/removeRecipient',
+    async (arg) => {
+        return await deleteRecipient(arg);
+    },
+    {
+        condition: (arg, {getState}) => {
+            const state = getState();
+            return selectCurrentReportStatus(state) === 'idle'
+        }
+    }
+)
+
+export const runReport = createAsyncThunk<RunResponse | null, ExecRunProps, { state: RootState }>(
+    'current/runReport',
+    async (arg) => {
+        return await execRun(arg);
+    },
+    {
+        condition: (arg, {getState}) => {
+            const state = getState();
+            return selectCurrentReportStatus(state) === 'idle'
+        }
+    }
+)

@@ -141,3 +141,13 @@ export interface RunResponse {
     dryRun?:boolean,
     error?: string,
 }
+
+
+export interface LoadReportResponse {
+    report: ReportRecord|null;
+    recipients: Recipient[]
+}
+export interface SaveRecipientsResponse {
+    recipients: Recipient[],
+    recipient: Recipient|null
+}
