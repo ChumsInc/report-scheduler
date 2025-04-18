@@ -139,7 +139,7 @@ export async function execRun(arg: ExecRunProps): Promise<RunResponse | null> {
             today = 'today';
         }
 
-        const url = '/api/report-scheduler/report/:idReport/exec/:today.json'
+        const url = '/api/report-scheduler/reports/:idReport/exec/:today.json'
             .replace(':idReport', encodeURIComponent(arg.idReport))
             .replace(':today', encodeURIComponent(today));
         return await fetchJSON(url);
