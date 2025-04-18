@@ -16,6 +16,7 @@ require_once "autoload.inc.php";
 $ui = new WebUI2([
     'title' => 'Report Scheduler',
     'bodyClassName' => 'container-fluid',
+    'contentFile' => 'body.inc.php',
     'requiredRoles' => [Groups::ADMIN, Groups::REPADMIN],
 ]);
 $ui->addManifestJSON('public/js/manifest.json')

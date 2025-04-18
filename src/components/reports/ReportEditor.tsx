@@ -148,7 +148,7 @@ const ReportEditor: React.FC = () => {
                 </Col>
                 <Col sm={8}>
                     <ReportTextInput report={report} field="url_path" label="Report URL"
-                                     onChange={reportChangeHandler}/>
+                                     onChange={reportChangeHandler} formText="Local API path only, do not use full URL."/>
                     <ChumsFormGroup label="URL Generator" labelWidth={2} className="mb-3">
                         <Col>
                             <AceEditor mode="javascript" value={report.url_generator} onChange={onChangeURLGenerator}
@@ -175,7 +175,7 @@ const ReportEditor: React.FC = () => {
                 <Button type="submit" variant="primary" size="sm" disabled={status !== 'idle'}>Save</Button>
             </Stack>
             {report.changed && <Alert color="warning">Don't forget to save</Alert>}
-            <Modal size="xl" onClose={() => setShowModal(false)} show={showModal}><ExecResult/></Modal>
+            <ExecResult size="xl" onHide={() => setShowModal(false)} show={showModal} />
         </Form>
     )
 }

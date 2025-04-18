@@ -12,6 +12,7 @@ import {selectSort, selectSortedList, selectStatus, setSort} from "@/ducks/repor
 import {loadReport} from "@/ducks/current/actions";
 
 const fields: SortableTableField<ReportRecord>[] = [
+    {field: 'id', title: 'ID', sortable: true, align: 'end'},
     {field: 'title', title: 'Title', sortable: true},
     {field: 'week_days', title: 'Weekly', sortable: true, render: (row) => <WeekDays weekDays={row.week_days}/>},
     {field: 'month_days', title: 'Monthly', sortable: true, render: (row) => <MonthDays monthDays={row.month_days}/>},

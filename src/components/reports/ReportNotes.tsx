@@ -30,12 +30,12 @@ export default function ReportNotes() {
                         <code className="mt-1">
                             <pre style={{whiteSpace: 'pre-wrap'}}>
                                 {`# report scheduler for all reports.\n\n`}
-                                {'30 22 * * *   steve timeout 6h curl -s -S -K /etc/chums/curl-creds https://intranet.chums.com/api/report-scheduler/report/exec/today.json >> /var/log/chums/report-scheduler.log'}
+                                {'30 22 * * *   steve timeout 6h curl -s -S -K /etc/chums/curl-creds https://intranet.chums.com/api/report-scheduler/reports/exec/today.json >> /var/log/chums/report-scheduler.log'}
                             </pre>
                         </code>
                     </NotesDefinition>
                     <NotesDefinition subject="Report URL">
-                        The URL (or URL template) that is requested for the mailer content generation
+                        The URL (or URL template) that is requested for the mailer content generation. <em className="text-warning-emphasis">Use a local API endpoint only, do not use full URLs</em>.
                     </NotesDefinition>
                     <NotesDefinition subject="URL Generator">
                         <div>(optional) A javascript snippet used to generate the URL based on the template. This snippet receives two parameters</div>

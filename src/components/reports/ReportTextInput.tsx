@@ -1,6 +1,6 @@
 import React, {ChangeEvent, useId} from 'react';
 import {ReportRecord} from "@/app/types";
-import {Col, FormControl, FormControlProps, InputGroup} from "react-bootstrap";
+import {Col, FormControl, FormControlProps, FormText, FormTextProps, InputGroup} from "react-bootstrap";
 import ChumsFormGroup, {ChumsFormGroupProps} from "@/components/common/ChumsFormGroup";
 
 export interface ReportTextInputProps extends Omit<FormControlProps, 'value' | 'onChange' | 'id'> {
@@ -10,6 +10,8 @@ export interface ReportTextInputProps extends Omit<FormControlProps, 'value' | '
     inputGroupLabel?: string | React.ReactNode;
     onChange: (changes: Partial<ReportRecord>) => void;
     containerProps?: Partial<ChumsFormGroupProps>;
+    formText?: string | React.ReactNode;
+    formTextProps?: FormTextProps;
 }
 
 export default function ReportTextInput({
@@ -19,6 +21,8 @@ export default function ReportTextInput({
                                             inputGroupLabel,
                                             onChange,
                                             containerProps,
+    formText,
+    formTextProps,
                                             ...rest
                                         }: ReportTextInputProps) {
     const id = useId();
@@ -44,6 +48,9 @@ export default function ReportTextInput({
                     <FormControl type="text" id={id} size="sm"
                                  value={report[field] ?? ''} onChange={changeHandler}
                                  {...rest} />
+                )}
+                {!!formText && (
+                    <FormText {...formTextProps}>{formText}</FormText>
                 )}
             </Col>
         </ChumsFormGroup>
