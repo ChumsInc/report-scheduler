@@ -6,10 +6,14 @@ export interface MonthDaysProps {
     monthDays: (string|number)[],
 }
 
-const WeekDays: React.FC<MonthDaysProps> = ({monthDays}) => {
+const WeekDays = ({monthDays}:MonthDaysProps) => {
     return (
         <div>
-            {monthDays.map((day) => <MonthDay day={String(day)} key={day}/>
+            {monthDays
+                .filter((day) => String(day) > '')
+                .map((day) => (
+                    <MonthDay key={day} day={String(day)}/>
+                )
             )}
         </div>
     )
@@ -18,7 +22,7 @@ const WeekDays: React.FC<MonthDaysProps> = ({monthDays}) => {
 export default WeekDays;
 
 
-const MonthDay: React.FC<{ day: string }> = ({day}) => {
+const MonthDay = ({day}:{ day: string }) => {
     const className = {
         'bg-primary': true,
         'text-light': true,
