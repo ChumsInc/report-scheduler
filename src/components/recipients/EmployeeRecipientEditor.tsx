@@ -28,8 +28,7 @@ export default function EmployeeRecipientEditor({recipient, onChange}: EmployeeR
                         <InputGroup.Text aria-hidden>@</InputGroup.Text>
                         <FormControl type="text" size="sm" required id={emailId}
                                      value={recipient.EmailAddress}
-                                     onChange={changeHandler('EmailAddress')}
-                                     maxLength={2} minLength={2}/>
+                                     onChange={changeHandler('EmailAddress')}/>
                     </InputGroup>
                 </Col>
             </Form.Group>
@@ -42,8 +41,7 @@ export default function EmployeeRecipientEditor({recipient, onChange}: EmployeeR
                         </InputGroup.Text>
                         <FormControl type="text" size="sm" required id={nameId}
                                      value={recipient.Name ?? ''}
-                                     onChange={changeHandler('Name')}
-                                     minLength={4} maxLength={4}/>
+                                     onChange={changeHandler('Name')}/>
                     </InputGroup>
 
                 </Col>
